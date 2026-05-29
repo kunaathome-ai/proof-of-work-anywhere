@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Lock, AlertCircle, Shield } from 'lucide-react'
+import { Shield, AlertCircle } from 'lucide-react'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -14,10 +14,8 @@ export default function Login() {
     setError('')
     setLoading(true)
 
-    // Simulate authentication (in production, this would call your auth API)
     setTimeout(() => {
       if (email === 'admin@veriforge.com' && password === 'admin123') {
-        // Store auth token
         localStorage.setItem('authToken', 'demo-token')
         localStorage.setItem('user', JSON.stringify({ email, role: 'admin' }))
         navigate('/')
@@ -29,67 +27,78 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--v-bg)' }}>
+      <div className="w-full max-w-md">
+        {/* Logo */}
         <div className="text-center mb-8">
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Shield className="w-10 h-10 text-white" />
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 rounded-xl mb-4"
+            style={{ backgroundColor: 'var(--v-primary)' }}
+          >
+            <Shield className="w-8 h-8" style={{ color: 'var(--v-accent)' }} />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Veriforge Admin</h1>
-          <p className="text-gray-600 text-lg">Sign in to access the admin console</p>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--v-text)' }}>Veriforge Admin</h1>
+          <p style={{ color: 'var(--v-text-tertiary)' }} className="mt-1">Sign in to your account</p>
         </div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start">
-            <AlertCircle className="w-5 h-5 text-red-600 mr-2 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-red-800">{error}</p>
-          </div>
-        )}
+        {/* Card */}
+        <div className="v-card p-8">
+          {error && (
+            <div className="v-alert v-alert-danger mb-6">
+              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <p>{error}</p>
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-              Email Address
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-lg"
-              placeholder="admin@veriforge.com"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label htmlFor="email" className="block text-sm font-semibold mb-2" style={{ color: 'var(--v-text)' }}>
+                Email address
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="v-input"
+                placeholder="admin@veriforge.com"
+              />
+            </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-lg"
-              placeholder="•••••••••"
-            />
-          </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-semibold mb-2" style={{ color: 'var(--v-text)' }}>
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="v-input"
+                placeholder="Enter your password"
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed shadow-lg"
-          >
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={loading}
+              className="v-btn v-btn-primary w-full justify-center"
+              style={{ padding: '0.75rem 1.25rem' }}
+            >
+              {loading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+        </div>
 
-        <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm text-blue-900 font-medium mb-1">Demo Credentials:</p>
-          <p className="text-sm text-blue-800">Email: admin@veriforge.com</p>
-          <p className="text-sm text-blue-800">Password: admin123</p>
+        {/* Demo hint */}
+        <div
+          className="mt-6 p-4 rounded-lg text-center text-sm"
+          style={{ backgroundColor: 'var(--v-bg-subtle)', color: 'var(--v-text-tertiary)' }}
+        >
+          <p className="font-semibold mb-1" style={{ color: 'var(--v-text-secondary)' }}>Demo Account</p>
+          <p>admin@veriforge.com / admin123</p>
         </div>
       </div>
     </div>

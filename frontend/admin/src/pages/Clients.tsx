@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Search, Building2, Settings, Eye, Database, Briefcase } from 'lucide-react'
+import { Plus, Search, Building2, Database, Briefcase, Mail, Settings, ArrowUpRight } from 'lucide-react'
 
 export default function Clients() {
   const [clients] = useState([
@@ -8,87 +8,123 @@ export default function Clients() {
     { id: 3, name: 'BuildCo', plan: 'starter', jobs: 18, storage: 'local', email: 'admin@buildco.com' },
   ])
 
+  const getPlanBadge = (plan: string) => {
+    switch (plan) {
+      case 'enterprise':
+        return <span className="v-badge" style={{ backgroundColor: '#f0fdf4', color: '#059669' }}>Enterprise</span>
+      case 'professional':
+        return <span className="v-badge" style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}>Professional</span>
+      case 'starter':
+        return <span className="v-badge v-badge-neutral">Starter</span>
+      default:
+        return <span className="v-badge v-badge-neutral">{plan}</span>
+    }
+  }
+
+  const getStorageIcon = (storage: string) => {
+    switch (storage) {
+      case 'azure_blob':
+        return { bg: '#eff6ff', color: '#2563eb', label: 'Azure Blob' }
+      case 's3':
+        return { bg: '#fffbeb', color: '#d97706', label: 'AWS S3' }
+      case 'local':
+        return { bg: '#f8fafc', color: '#64748b', label: 'Local' }
+      default:
+        return { bg: '#f8fafc', color: '#64748b', label: storage }
+    }
+  }
+
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Clients</h1>
-        <p className="text-lg text-gray-600">Manage client accounts and configurations</p>
+      {/* Page Header */}
+      <div className="v-page-header">
+        <h1>Clients</h1>
+        <p>Manage client accounts and configurations</p>
       </div>
 
-      {/* Header Actions */}
-      <div className="flex justify-between items-center mb-6">
+      {/* Toolbar */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--v-text-muted)' }} />
           <input
             type="text"
             placeholder="Search clients..."
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-lg"
+            className="v-input pl-10"
           />
         </div>
-        <button className="bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center hover:bg-blue-700 transition-colors font-semibold text-lg">
-          <Plus className="w-5 h-5 mr-2" />
+        <button className="v-btn v-btn-primary">
+          <Plus className="w-4 h-4" />
           Add Client
         </button>
       </div>
 
       {/* Clients Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {clients.map((client) => (
-          <div key={client.id} className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center">
-                <div className="p-3 bg-blue-100 rounded-lg mr-3">
-                  <Building2 className="w-6 h-6 text-blue-600" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {clients.map((client) => {
+          const storageStyle = getStorageIcon(client.storage)
+          return (
+            <div key={client.id} className="v-card p-6">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="flex items-center justify-center w-11 h-11 rounded-xl flex-shrink-0"
+                    style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}
+                  >
+                    <Building2 className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-lg font-bold truncate" style={{ color: 'var(--v-text)' }}>{client.name}</h3>
+                    <p className="text-xs font-mono" style={{ color: 'var(--v-text-muted)' }}>ID: {client.id.toString().padStart(4, '0')}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">{client.name}</h3>
-                  <p className="text-sm text-gray-500">#{client.id}</p>
-                </div>
+                {getPlanBadge(client.plan)}
               </div>
-              <span className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                client.plan === 'enterprise' ? 'bg-purple-100 text-purple-800' :
-                client.plan === 'professional' ? 'bg-blue-100 text-blue-800' :
-                'bg-gray-100 text-gray-800'
-              }`}>
-                {client.plan}
-              </span>
-            </div>
 
-            <div className="space-y-3 mb-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center text-gray-600">
-                  <Briefcase className="w-4 h-4 mr-2" />
-                  <span className="font-medium">Active Jobs</span>
+              {/* Details */}
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="w-4 h-4" style={{ color: 'var(--v-text-muted)' }} />
+                    <span className="text-sm font-medium" style={{ color: 'var(--v-text-secondary)' }}>Active Jobs</span>
+                  </div>
+                  <span className="font-bold text-lg" style={{ color: 'var(--v-text)' }}>{client.jobs}</span>
                 </div>
-                <span className="text-xl font-bold text-gray-900">{client.jobs}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center text-gray-600">
-                  <Database className="w-4 h-4 mr-2" />
-                  <span className="font-medium">Storage</span>
-                </div>
-                <span className="text-lg font-semibold text-gray-900">{client.storage}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center text-gray-600">
-                  <span className="font-medium">Email</span>
-                </div>
-                <span className="text-sm text-gray-900">{client.email}</span>
-              </div>
-            </div>
 
-            <div className="pt-4 border-t border-gray-200 flex gap-3">
-              <button className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors font-medium">
-                <Eye className="w-4 h-4 mr-2" />
-                View
-              </button>
-              <button className="flex-1 flex items-center justify-center px-4 py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors font-medium">
-                <Settings className="w-4 h-4 mr-2" />
-                Configure
-              </button>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Database className="w-4 h-4" style={{ color: 'var(--v-text-muted)' }} />
+                    <span className="text-sm font-medium" style={{ color: 'var(--v-text-secondary)' }}>Storage</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: storageStyle.color }} />
+                    <span className="text-sm font-semibold" style={{ color: 'var(--v-text)' }}>{storageStyle.label}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4" style={{ color: 'var(--v-text-muted)' }} />
+                    <span className="text-sm font-medium" style={{ color: 'var(--v-text-secondary)' }}>Contact</span>
+                  </div>
+                  <span className="text-sm" style={{ color: 'var(--v-text)' }}>{client.email}</span>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-4" style={{ borderTop: '1px solid var(--v-border-light)' }}>
+                <button className="v-btn v-btn-secondary flex-1 justify-center text-sm">
+                  <Settings className="w-4 h-4" />
+                  Configure
+                </button>
+                <button className="v-btn v-btn-primary flex-1 justify-center text-sm">
+                  <ArrowUpRight className="w-4 h-4" />
+                  View
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

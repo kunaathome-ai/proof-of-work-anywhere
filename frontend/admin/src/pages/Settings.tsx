@@ -1,166 +1,150 @@
 import { useState } from 'react'
-import { Save, Server, Shield, Bell, Database, Cloud, Lock, Activity, CheckCircle } from 'lucide-react'
+import { Save, Server, Shield, Bell, Database, Cloud, Lock, Activity } from 'lucide-react'
 
 export default function Settings() {
   const [runtimeMode, setRuntimeMode] = useState('local')
 
+  const modes = [
+    { id: 'local', label: 'Local Development', icon: Database, desc: 'SQLite, local filesystem, mock AI' },
+    { id: 'on_prem', label: 'On-Premises', icon: Server, desc: 'Postgres, MinIO, local AI inference' },
+    { id: 'cloud', label: 'Cloud', icon: Cloud, desc: 'Managed services, auto-scaling' },
+  ]
+
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Settings</h1>
-        <p className="text-lg text-gray-600">Configure system settings and preferences</p>
+      {/* Page Header */}
+      <div className="v-page-header">
+        <h1>Settings</h1>
+        <p>Configure system preferences and environment</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-4xl">
         {/* Runtime Mode */}
-        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
-          <div className="flex items-center mb-6">
-            <div className="p-3 bg-blue-100 rounded-lg mr-4">
-              <Server className="w-6 h-6 text-blue-600" />
+        <div className="v-card p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="v-stat-icon" style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}>
+              <Server className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">Runtime Mode</h3>
-              <p className="text-gray-500">Configure deployment environment</p>
+              <h3>Runtime Mode</h3>
+              <p className="text-sm" style={{ color: 'var(--v-text-muted)' }}>Select your deployment environment</p>
             </div>
           </div>
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">Current Mode</label>
-              <select
-                value={runtimeMode}
-                onChange={(e) => setRuntimeMode(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-lg"
-              >
-                <option value="local">Local Development</option>
-                <option value="on_prem">On-Premises</option>
-                <option value="cloud">Cloud</option>
-              </select>
-            </div>
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-100">
-              <div className="space-y-3">
-                <div className="flex items-start">
-                  <div className="p-2 bg-white rounded-lg mr-3 mt-1">
-                    <Database className="w-4 h-4 text-gray-600" />
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            {modes.map((mode) => {
+              const Icon = mode.icon
+              const isSelected = runtimeMode === mode.id
+              return (
+                <button
+                  key={mode.id}
+                  onClick={() => setRuntimeMode(mode.id)}
+                  className="text-left p-5 rounded-xl border-2 transition-all"
+                  style={{
+                    borderColor: isSelected ? 'var(--v-accent)' : 'var(--v-border-light)',
+                    backgroundColor: isSelected ? 'rgba(13, 148, 136, 0.05)' : 'var(--v-bg-elevated)',
+                  }}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div
+                      className="flex items-center justify-center w-9 h-9 rounded-lg"
+                      style={{
+                        backgroundColor: isSelected ? 'var(--v-accent)' : 'var(--v-bg-subtle)',
+                        color: isSelected ? 'white' : 'var(--v-text-tertiary)',
+                      }}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <span className="font-bold text-sm" style={{ color: isSelected ? 'var(--v-text)' : 'var(--v-text-secondary)' }}>
+                      {mode.label}
+                    </span>
                   </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">Local Development</p>
-                    <p className="text-sm text-gray-600">SQLite, local filesystem, mock AI for development</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <div className="p-2 bg-white rounded-lg mr-3 mt-1">
-                    <Server className="w-4 h-4 text-gray-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">On-Premises</p>
-                    <p className="text-sm text-gray-600">Postgres, MinIO, local AI inference, offline operation</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <div className="p-2 bg-white rounded-lg mr-3 mt-1">
-                    <Cloud className="w-4 h-4 text-gray-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">Cloud</p>
-                    <p className="text-sm text-gray-600">Managed services, auto-scaling, cloud AI models</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+                  <p className="text-sm" style={{ color: 'var(--v-text-muted)' }}>{mode.desc}</p>
+                </button>
+              )
+            })}
           </div>
         </div>
 
         {/* Security */}
-        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
-          <div className="flex items-center mb-6">
-            <div className="p-3 bg-green-100 rounded-lg mr-4">
-              <Shield className="w-6 h-6 text-green-600" />
+        <div className="v-card p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="v-stat-icon" style={{ backgroundColor: '#ecfdf5', color: '#059669' }}>
+              <Shield className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">Security</h3>
-              <p className="text-gray-500">Authentication and authorization settings</p>
+              <h3>Security</h3>
+              <p className="text-sm" style={{ color: 'var(--v-text-muted)' }}>Authentication and access control</p>
             </div>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">JWT Secret</label>
-                <input
-                  type="password"
-                  defaultValue="change-in-production"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">JWT Expiry</label>
-                <input
-                  type="text"
-                  defaultValue="24h"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--v-text)' }}>JWT Secret</label>
+              <input type="password" defaultValue="change-in-production" className="v-input" />
             </div>
-            <div className="space-y-6">
-              <div className="flex items-center p-4 bg-gray-50 rounded-lg">
-                <input type="checkbox" id="oidc" className="mr-3 w-5 h-5" />
-                <label htmlFor="oidc" className="text-gray-900 font-medium">Enable OIDC Authentication</label>
-              </div>
-              <div className="flex items-center p-4 bg-gray-50 rounded-lg">
-                <input type="checkbox" id="mfa" className="mr-3 w-5 h-5" />
-                <label htmlFor="mfa" className="text-gray-900 font-medium">Enable Multi-Factor Authentication</label>
-              </div>
+            <div>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--v-text)' }}>Token Expiry</label>
+              <input type="text" defaultValue="24h" className="v-input" />
             </div>
+          </div>
+
+          <div className="flex gap-4 mt-5">
+            <label className="flex items-center gap-3 p-4 rounded-lg flex-1 cursor-pointer" style={{ backgroundColor: 'var(--v-bg-subtle)' }}>
+              <input type="checkbox" className="w-5 h-5 rounded accent-teal-600" />
+              <span className="text-sm font-medium" style={{ color: 'var(--v-text)' }}>Enable OIDC Authentication</span>
+            </label>
+            <label className="flex items-center gap-3 p-4 rounded-lg flex-1 cursor-pointer" style={{ backgroundColor: 'var(--v-bg-subtle)' }}>
+              <input type="checkbox" className="w-5 h-5 rounded accent-teal-600" />
+              <span className="text-sm font-medium" style={{ color: 'var(--v-text)' }}>Require Multi-Factor Auth</span>
+            </label>
           </div>
         </div>
 
         {/* Observability */}
-        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
-          <div className="flex items-center mb-6">
-            <div className="p-3 bg-purple-100 rounded-lg mr-4">
-              <Bell className="w-6 h-6 text-purple-600" />
+        <div className="v-card p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="v-stat-icon" style={{ backgroundColor: '#faf5ff', color: '#7c3aed' }}>
+              <Bell className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">Observability</h3>
-              <p className="text-gray-500">Monitoring, logging, and tracing configuration</p>
+              <h3>Observability</h3>
+              <p className="text-sm" style={{ color: 'var(--v-text-muted)' }}>Monitoring and logging configuration</p>
             </div>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-6">
-              <div className="flex items-center p-4 bg-gray-50 rounded-lg">
-                <input type="checkbox" id="metrics" className="mr-3 w-5 h-5" defaultChecked />
-                <label htmlFor="metrics" className="text-gray-900 font-medium">Enable Metrics Collection</label>
-              </div>
-              <div className="flex items-center p-4 bg-gray-50 rounded-lg">
-                <input type="checkbox" id="tracing" className="mr-3 w-5 h-5" />
-                <label htmlFor="tracing" className="text-gray-900 font-medium">Enable Distributed Tracing</label>
-              </div>
+            <div>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--v-text)' }}>Log Level</label>
+              <select className="v-input">
+                <option value="debug">Debug</option>
+                <option value="info" selected>Info</option>
+                <option value="warn">Warning</option>
+                <option value="error">Error</option>
+              </select>
             </div>
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Log Level</label>
-                <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900">
-                  <option value="debug">Debug</option>
-                  <option value="info" selected>Info</option>
-                  <option value="warn">Warning</option>
-                  <option value="error">Error</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Retention Period (days)</label>
-                <input
-                  type="number"
-                  defaultValue="30"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--v-text)' }}>Retention (days)</label>
+              <input type="number" defaultValue="30" className="v-input" />
             </div>
+          </div>
+
+          <div className="flex gap-4 mt-5">
+            <label className="flex items-center gap-3 p-4 rounded-lg flex-1 cursor-pointer" style={{ backgroundColor: 'var(--v-bg-subtle)' }}>
+              <input type="checkbox" defaultChecked className="w-5 h-5 rounded accent-teal-600" />
+              <span className="text-sm font-medium" style={{ color: 'var(--v-text)' }}>Collect Metrics</span>
+            </label>
+            <label className="flex items-center gap-3 p-4 rounded-lg flex-1 cursor-pointer" style={{ backgroundColor: 'var(--v-bg-subtle)' }}>
+              <input type="checkbox" className="w-5 h-5 rounded accent-teal-600" />
+              <span className="text-sm font-medium" style={{ color: 'var(--v-text)' }}>Distributed Tracing</span>
+            </label>
           </div>
         </div>
 
-        {/* Save Button */}
+        {/* Save */}
         <div className="flex justify-end">
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-lg flex items-center hover:bg-blue-700 transition-colors font-semibold text-lg">
-            <Save className="w-5 h-5 mr-2" />
+          <button className="v-btn v-btn-primary">
+            <Save className="w-4 h-4" />
             Save Settings
           </button>
         </div>

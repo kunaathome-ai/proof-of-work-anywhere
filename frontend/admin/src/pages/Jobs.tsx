@@ -1,108 +1,118 @@
 import { useState } from 'react'
-import { Plus, Search, Filter, Eye, Edit, Trash2, Briefcase, MapPin } from 'lucide-react'
+import { Search, Filter, Briefcase, MapPin, Eye, Pencil, Trash2, Plus } from 'lucide-react'
 
 export default function Jobs() {
   const [jobs] = useState([
     { id: 1, title: 'Site Inspection - Downtown', client: 'Acme Corp', status: 'active', created: '2024-01-15', location: '123 Main St, Downtown' },
     { id: 2, title: 'Equipment Verification', client: 'Tech Solutions', status: 'completed', created: '2024-01-14', location: '456 Tech Ave' },
     { id: 3, title: 'Safety Audit', client: 'BuildCo', status: 'draft', created: '2024-01-13', location: '789 Construction Blvd' },
+    { id: 4, title: 'Progress Check', client: 'Acme Corp', status: 'active', created: '2024-01-12', location: '123 Main St, Downtown' },
+    { id: 5, title: 'Final Review', client: 'Tech Solutions', status: 'completed', created: '2024-01-11', location: '456 Tech Ave' },
   ])
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active':
+        return <span className="v-badge v-badge-info">Active</span>
+      case 'completed':
+        return <span className="v-badge v-badge-success">Completed</span>
+      case 'draft':
+        return <span className="v-badge v-badge-neutral">Draft</span>
+      default:
+        return <span className="v-badge v-badge-neutral">{status}</span>
+    }
+  }
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Jobs</h1>
-        <p className="text-lg text-gray-600">Manage verification jobs and tasks</p>
+      {/* Page Header */}
+      <div className="v-page-header">
+        <h1>Jobs</h1>
+        <p>Manage verification jobs and tasks</p>
       </div>
 
-      {/* Header Actions */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search jobs..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-lg"
-            />
-          </div>
-          <button className="flex items-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium">
-            <Filter className="w-5 h-5 mr-2" />
+      {/* Toolbar */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--v-text-muted)' }} />
+          <input
+            type="text"
+            placeholder="Search jobs..."
+            className="v-input pl-10"
+          />
+        </div>
+        <div className="flex gap-3">
+          <button className="v-btn v-btn-secondary">
+            <Filter className="w-4 h-4" />
             Filter
           </button>
+          <button className="v-btn v-btn-primary">
+            <Plus className="w-4 h-4" />
+            Create Job
+          </button>
         </div>
-        <button className="bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center hover:bg-blue-700 transition-colors font-semibold text-lg">
-          <Plus className="w-5 h-5 mr-2" />
-          Create Job
-        </button>
       </div>
 
-      {/* Jobs Table */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Job</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Client</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Location</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Created</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+      {/* Table */}
+      <div className="v-card overflow-hidden">
+        <table className="v-table">
+          <thead>
+            <tr>
+              <th>Job</th>
+              <th>Client</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {jobs.map((job) => (
+              <tr key={job.id}>
+                <td>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex items-center justify-center w-9 h-9 rounded-lg flex-shrink-0"
+                      style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}
+                    >
+                      <Briefcase className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm" style={{ color: 'var(--v-text)' }}>{job.title}</p>
+                      <p className="text-xs font-mono" style={{ color: 'var(--v-text-muted)' }}>#{job.id.toString().padStart(4, '0')}</p>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span className="font-medium text-sm" style={{ color: 'var(--v-text)' }}>{job.client}</span>
+                </td>
+                <td>
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--v-text-muted)' }} />
+                    <span className="text-sm" style={{ color: 'var(--v-text-secondary)' }}>{job.location}</span>
+                  </div>
+                </td>
+                <td>{getStatusBadge(job.status)}</td>
+                <td>
+                  <span className="text-sm font-mono" style={{ color: 'var(--v-text-secondary)' }}>{job.created}</span>
+                </td>
+                <td>
+                  <div className="flex items-center gap-2">
+                    <button className="v-btn v-btn-ghost p-2">
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button className="v-btn v-btn-ghost p-2">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button className="v-btn v-btn-ghost p-2" style={{ color: 'var(--v-danger)' }}>
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {jobs.map((job) => (
-                <tr key={job.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center">
-                      <div className="p-2 bg-blue-100 rounded-lg mr-3">
-                        <Briefcase className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900 text-lg">{job.title}</p>
-                        <p className="text-sm text-gray-500">#{job.id}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-gray-900 font-medium">{job.client}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center text-gray-600">
-                      <MapPin className="w-4 h-4 mr-2" />
-                      {job.location}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                      job.status === 'active' ? 'bg-green-100 text-green-800' :
-                      job.status === 'completed' ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {job.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-gray-600">{job.created}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <button className="text-blue-600 hover:text-blue-900 font-medium flex items-center">
-                        <Eye className="w-4 h-4 mr-1" />
-                        View
-                      </button>
-                      <button className="text-gray-600 hover:text-gray-900 font-medium flex items-center">
-                        <Edit className="w-4 h-4 mr-1" />
-                        Edit
-                      </button>
-                      <button className="text-red-600 hover:text-red-900 font-medium flex items-center">
-                        <Trash2 className="w-4 h-4 mr-1" />
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )

@@ -13,7 +13,7 @@ interface ChecklistItem {
 export default function Checklist() {
   const navigate = useNavigate()
   const { jobId } = useParams()
-  
+
   const [items, setItems] = useState<ChecklistItem[]>([
     { id: '1', text: 'Verify safety equipment presence', type: 'boolean', completed: false },
     { id: '2', text: 'Check emergency exits', type: 'boolean', completed: false },
@@ -23,19 +23,18 @@ export default function Checklist() {
   ])
 
   const toggleItem = (id: string) => {
-    setItems(prev => prev.map(item => 
+    setItems(prev => prev.map(item =>
       item.id === id ? { ...item, completed: !item.completed } : item
     ))
   }
 
   const updateNotes = (id: string, notes: string) => {
-    setItems(prev => prev.map(item => 
+    setItems(prev => prev.map(item =>
       item.id === id ? { ...item, notes } : item
     ))
   }
 
   const handleSubmit = () => {
-    // Submit evidence and navigate to summary
     navigate('/summary/abc123')
   }
 
@@ -43,121 +42,129 @@ export default function Checklist() {
   const totalCount = items.length
   const progress = (completedCount / totalCount) * 100
 
-  const getItemIcon = (type: string) => {
+  const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'text':
-        return <FileText className="w-4 h-4" />
-      case 'photo':
-        return <Camera className="w-4 h-4" />
-      default:
-        return <Check className="w-4 h-4" />
+      case 'text': return <FileText className="w-4 h-4" />
+      case 'photo': return <Camera className="w-4 h-4" />
+      default: return <Check className="w-4 h-4" />
     }
   }
 
-  const getItemColor = (type: string) => {
+  const getTypeColor = (type: string) => {
     switch (type) {
-      case 'text':
-        return 'bg-purple-100 text-purple-600'
-      case 'photo':
-        return 'bg-blue-100 text-blue-600'
-      default:
-        return 'bg-green-100 text-green-600'
+      case 'text': return { bg: '#faf5ff', color: '#7c3aed' }
+      case 'photo': return { bg: '#eff6ff', color: '#2563eb' }
+      default: return { bg: '#ecfdf5', color: '#059669' }
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
+    <div className="min-h-screen pb-8" style={{ backgroundColor: 'var(--v-bg)' }}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-6 pb-16">
-        <div className="flex items-center mb-3">
-          <div className="p-2 bg-white/20 rounded-lg mr-3">
-            <List className="w-6 h-6" />
+      <div className="v-section-header pb-10">
+        <div className="px-4">
+          <div className="flex items-center gap-2 mb-2">
+            <List className="w-4 h-4 opacity-70" />
+            <span className="text-xs font-semibold uppercase tracking-wider opacity-70">Job #{jobId}</span>
           </div>
-          <span className="text-sm font-semibold uppercase tracking-wide">Job #{jobId}</span>
-        </div>
-        <h1 className="text-3xl font-bold mb-2">Checklist</h1>
-        <div className="flex items-center mt-4">
-          <div className="flex-1 bg-white/30 rounded-full h-3">
-            <div 
-              className="bg-white h-3 rounded-full transition-all"
-              style={{ width: `${progress}%` }}
-            />
+          <h1>Checklist</h1>
+          <div className="flex items-center gap-3 mt-3">
+            <div className="flex-1 v-progress-track">
+              <div className="v-progress-fill" style={{ width: `${progress}%` }} />
+            </div>
+            <span className="text-sm font-bold">{completedCount}/{totalCount}</span>
           </div>
-          <span className="ml-3 text-sm font-semibold">{completedCount}/{totalCount}</span>
         </div>
       </div>
 
-      <div className="px-4 -mt-10 py-6 space-y-4">
-        {items.map((item) => (
-          <div 
-            key={item.id} 
-            className={`bg-white rounded-xl shadow-lg p-5 border-2 transition-all ${
-              item.completed ? 'border-green-200 bg-green-50' : 'border-gray-200'
-            }`}
-          >
-            <div className="flex items-start">
-              <button
-                onClick={() => toggleItem(item.id)}
-                className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center mr-4 transition-all ${
-                  item.completed 
-                    ? 'bg-green-500 border-green-500 text-white' 
-                    : 'border-gray-300 hover:border-blue-500'
-                }`}
-              >
-                {item.completed && <Check className="w-5 h-5" />}
-              </button>
-              <div className="flex-1">
-                <div className="flex items-center mb-2">
-                  <div className={`p-2 rounded-lg mr-3 ${getItemColor(item.type)}`}>
-                    {getItemIcon(item.type)}
+      <div className="px-4 -mt-6 space-y-3">
+        {items.map((item) => {
+          const typeColor = getTypeColor(item.type)
+          return (
+            <div
+              key={item.id}
+              className="v-card p-4"
+              style={{
+                borderColor: item.completed ? '#a7f3d0' : 'var(--v-border)',
+                backgroundColor: item.completed ? 'var(--v-success-bg)' : 'var(--v-bg-elevated)'
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <button
+                  onClick={() => toggleItem(item.id)}
+                  className="flex items-center justify-center w-7 h-7 rounded-full border-2 flex-shrink-0 mt-0.5 transition-all"
+                  style={{
+                    borderColor: item.completed ? 'var(--v-success)' : 'var(--v-border)',
+                    backgroundColor: item.completed ? 'var(--v-success)' : 'transparent',
+                    color: item.completed ? 'white' : 'transparent'
+                  }}
+                >
+                  {item.completed && <Check className="w-4 h-4" />}
+                </button>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div
+                      className="flex items-center justify-center w-6 h-6 rounded-md"
+                      style={{ backgroundColor: typeColor.bg, color: typeColor.color }}
+                    >
+                      {getTypeIcon(item.type)}
+                    </div>
+                    <p
+                      className="text-sm font-bold"
+                      style={{
+                        color: item.completed ? 'var(--v-text-muted)' : 'var(--v-text)',
+                        textDecoration: item.completed ? 'line-through' : 'none'
+                      }}
+                    >
+                      {item.text}
+                    </p>
                   </div>
-                  <p className={`font-bold text-lg ${item.completed ? 'text-gray-500 line-through' : 'text-gray-900'}`}>
-                    {item.text}
-                  </p>
+                  {item.type === 'text' && (
+                    <textarea
+                      value={item.notes || ''}
+                      onChange={(e) => updateNotes(item.id, e.target.value)}
+                      placeholder="Add notes..."
+                      className="v-input text-sm"
+                      rows={2}
+                    />
+                  )}
+                  {item.type === 'photo' && (
+                    <button className="v-btn v-btn-secondary text-sm py-2">
+                      <Camera className="w-4 h-4" />
+                      Add photo
+                    </button>
+                  )}
                 </div>
-                {item.type === 'text' && (
-                  <textarea
-                    value={item.notes || ''}
-                    onChange={(e) => updateNotes(item.id, e.target.value)}
-                    placeholder="Add notes..."
-                    className="w-full mt-3 p-3 border-2 border-gray-200 rounded-xl text-sm resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-                    rows={3}
-                  />
-                )}
-                {item.type === 'photo' && (
-                  <button className="mt-3 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-semibold flex items-center hover:bg-blue-100 transition-colors">
-                    <Camera className="w-4 h-4 mr-2" />
-                    Add photo
-                  </button>
-                )}
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
 
-        {/* Validation Message */}
+        {/* Validation */}
         {completedCount < totalCount && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start">
-            <AlertCircle className="w-5 h-5 text-amber-600 mr-3 mt-0.5" />
+          <div className="v-alert v-alert-warning">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-amber-900">Complete all items</p>
-              <p className="text-sm text-amber-700">Please complete all checklist items before submitting.</p>
+              <p className="font-bold text-sm">Complete all items</p>
+              <p className="text-sm opacity-90">Please check all items before submitting.</p>
             </div>
           </div>
         )}
 
-        {/* Submit Button */}
+        {/* Submit */}
         <button
           onClick={handleSubmit}
           disabled={completedCount < totalCount}
-          className={`w-full px-6 py-4 rounded-xl font-bold flex items-center justify-center text-lg transition-all ${
-            completedCount >= totalCount
-              ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          }`}
+          className="v-btn w-full justify-center"
+          style={{
+            ...(completedCount >= totalCount
+              ? { backgroundColor: 'var(--v-primary)', color: 'white', borderColor: 'var(--v-primary)' }
+              : { backgroundColor: 'var(--v-bg-subtle)', color: 'var(--v-text-muted)', borderColor: 'var(--v-border-light)', cursor: 'not-allowed' }
+            )
+          }}
         >
           Submit Evidence
-          <ChevronRight className="w-5 h-5 ml-2" />
+          <ChevronRight className="w-5 h-5" />
         </button>
       </div>
     </div>

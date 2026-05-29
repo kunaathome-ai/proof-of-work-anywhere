@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { MapPin, Camera, List, ArrowRight, Briefcase, Clock, CheckCircle } from 'lucide-react'
+import { MapPin, Camera, List, ArrowRight, Briefcase, Clock, Shield } from 'lucide-react'
 
 export default function JobDetails() {
   const navigate = useNavigate()
@@ -29,86 +29,116 @@ export default function JobDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
+    <div className="min-h-screen pb-8" style={{ backgroundColor: 'var(--v-bg)' }}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 pb-16">
-        <div className="flex items-center mb-3">
-          <div className="p-2 bg-white/20 rounded-lg mr-3">
-            <Briefcase className="w-6 h-6" />
+      <div className="v-section-header pb-10">
+        <div className="px-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Shield className="w-4 h-4 opacity-70" />
+            <span className="text-xs font-semibold uppercase tracking-wider opacity-70">Job #{id}</span>
           </div>
-          <span className="text-sm font-semibold uppercase tracking-wide">Job #{id}</span>
+          <h1>{job.title}</h1>
+          <p className="mt-1">{job.description}</p>
         </div>
-        <h1 className="text-3xl font-bold mb-2">{job.title}</h1>
-        <p className="text-blue-100 text-lg">{job.description}</p>
       </div>
 
       {/* Content */}
-      <div className="px-4 -mt-10">
-        <div className="bg-white rounded-xl shadow-xl p-6 space-y-6">
-          {/* Location */}
-          <div className="flex items-start p-4 bg-gray-50 rounded-lg">
-            <div className="bg-blue-100 p-3 rounded-lg mr-4">
-              <MapPin className="w-6 h-6 text-blue-600" />
+      <div className="px-4 -mt-6 space-y-4">
+        {/* Location */}
+        <div className="v-card p-5">
+          <div className="flex items-start gap-4">
+            <div
+              className="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0"
+              style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}
+            >
+              <MapPin className="w-5 h-5" />
             </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-900 mb-1 text-lg">Location</h3>
-              <p className="text-gray-700 font-medium">{job.location.address}</p>
-              <p className="text-sm text-gray-500 mt-1">
+            <div>
+              <h3 className="text-base font-bold mb-0.5" style={{ color: 'var(--v-text)' }}>Location</h3>
+              <p className="text-sm font-medium" style={{ color: 'var(--v-text-secondary)' }}>{job.location.address}</p>
+              <p className="text-xs font-mono mt-1" style={{ color: 'var(--v-text-muted)' }}>
                 {job.location.coordinates.lat.toFixed(4)}, {job.location.coordinates.lng.toFixed(4)}
               </p>
             </div>
           </div>
+        </div>
 
-          {/* Requirements */}
-          <div className="flex items-start p-4 bg-gray-50 rounded-lg">
-            <div className="bg-green-100 p-3 rounded-lg mr-4">
-              <Camera className="w-6 h-6 text-green-600" />
+        {/* Requirements */}
+        <div className="v-card p-5">
+          <div className="flex items-start gap-4">
+            <div
+              className="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0"
+              style={{ backgroundColor: '#ecfdf5', color: '#059669' }}
+            >
+              <Camera className="w-5 h-5" />
             </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-900 mb-1 text-lg">Photos Required</h3>
-              <p className="text-gray-700 font-medium">{job.requiredPhotos} photos</p>
+            <div>
+              <h3 className="text-base font-bold mb-0.5" style={{ color: 'var(--v-text)' }}>Photos Required</h3>
+              <p className="text-sm font-medium" style={{ color: 'var(--v-text-secondary)' }}>{job.requiredPhotos} photos minimum</p>
             </div>
           </div>
+        </div>
 
-          {/* Time Estimate */}
-          <div className="flex items-start p-4 bg-gray-50 rounded-lg">
-            <div className="bg-purple-100 p-3 rounded-lg mr-4">
-              <Clock className="w-6 h-6 text-purple-600" />
+        {/* Time */}
+        <div className="v-card p-5">
+          <div className="flex items-start gap-4">
+            <div
+              className="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0"
+              style={{ backgroundColor: '#faf5ff', color: '#7c3aed' }}
+            >
+              <Clock className="w-5 h-5" />
             </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-900 mb-1 text-lg">Estimated Time</h3>
-              <p className="text-gray-700 font-medium">{job.estimatedTime}</p>
+            <div>
+              <h3 className="text-base font-bold mb-0.5" style={{ color: 'var(--v-text)' }}>Estimated Time</h3>
+              <p className="text-sm font-medium" style={{ color: 'var(--v-text-secondary)' }}>{job.estimatedTime}</p>
             </div>
           </div>
+        </div>
 
-          {/* Checklist Preview */}
-          <div className="flex items-start p-4 bg-gray-50 rounded-lg">
-            <div className="bg-orange-100 p-3 rounded-lg mr-4">
-              <List className="w-6 h-6 text-orange-600" />
+        {/* Checklist */}
+        <div className="v-card p-5">
+          <div className="flex items-start gap-4 mb-4">
+            <div
+              className="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0"
+              style={{ backgroundColor: '#fffbeb', color: '#d97706' }}
+            >
+              <List className="w-5 h-5" />
             </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-900 mb-2 text-lg">Checklist Items</h3>
-              <ul className="space-y-3">
-                {job.checklist.map((item, index) => (
-                  <li key={index} className="text-gray-700 flex items-center">
-                    <span className="w-7 h-7 bg-white rounded-full flex items-center justify-center mr-3 text-sm font-bold text-gray-600 shadow-sm">
-                      {index + 1}
-                    </span>
-                    <span className="font-medium">{item}</span>
-                  </li>
-                ))}
-              </ul>
+            <div>
+              <h3 className="text-base font-bold" style={{ color: 'var(--v-text)' }}>Checklist</h3>
+              <p className="text-sm" style={{ color: 'var(--v-text-tertiary)' }}>{job.checklist.length} items to complete</p>
             </div>
+          </div>
+          <div className="space-y-2">
+            {job.checklist.map((item, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-3 p-3 rounded-lg"
+                style={{ backgroundColor: 'var(--v-bg-subtle)' }}
+              >
+                <span
+                  className="flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold flex-shrink-0"
+                  style={{
+                    backgroundColor: 'var(--v-bg-elevated)',
+                    color: 'var(--v-text-tertiary)',
+                    border: '1px solid var(--v-border)'
+                  }}
+                >
+                  {index + 1}
+                </span>
+                <span className="text-sm font-medium" style={{ color: 'var(--v-text-secondary)' }}>{item}</span>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Start Button */}
         <button
           onClick={handleStart}
-          className="w-full mt-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition-all flex items-center justify-center text-lg shadow-lg"
+          className="v-btn v-btn-primary w-full"
         >
           Start Evidence Capture
-          <ArrowRight className="w-5 h-5 ml-2" />
+          <ArrowRight className="w-5 h-5" />
         </button>
       </div>
     </div>

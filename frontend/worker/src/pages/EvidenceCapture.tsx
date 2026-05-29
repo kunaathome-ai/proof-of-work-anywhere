@@ -1,15 +1,14 @@
 import { useState, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Camera, MapPin, Upload, Check, X, ArrowRight, AlertCircle } from 'lucide-react'
+import { Camera, MapPin, ArrowRight, Check, X, AlertCircle, ImagePlus } from 'lucide-react'
 
 export default function EvidenceCapture() {
   const navigate = useNavigate()
   const { jobId } = useParams()
   const fileInputRef = useRef<HTMLInputElement>(null)
-  
+
   const [photos, setPhotos] = useState<string[]>([])
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
-  const [isCapturing, setIsCapturing] = useState(false)
 
   const handleCapture = () => {
     fileInputRef.current?.click()
@@ -58,67 +57,103 @@ export default function EvidenceCapture() {
   const canContinue = photos.length >= 1 && location
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
+    <div className="min-h-screen pb-8" style={{ backgroundColor: 'var(--v-bg)' }}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-6 pb-16">
-        <h1 className="text-3xl font-bold mb-2">Evidence Capture</h1>
-        <p className="text-blue-100 text-lg">Capture photos and location data</p>
+      <div className="v-section-header pb-10">
+        <div className="px-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Camera className="w-4 h-4 opacity-70" />
+            <span className="text-xs font-semibold uppercase tracking-wider opacity-70">Evidence Capture</span>
+          </div>
+          <h1>Capture Evidence</h1>
+          <p className="mt-1">Photos and location data</p>
+        </div>
       </div>
 
-      <div className="px-4 -mt-10 py-6 space-y-6">
-        {/* Photo Capture */}
-        <div className="bg-white rounded-xl shadow-xl p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg mr-3">
-                <Camera className="w-5 h-5 text-blue-600" />
+      <div className="px-4 -mt-6 space-y-4">
+        {/* Photos */}
+        <div className="v-card p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div
+                className="flex items-center justify-center w-9 h-9 rounded-xl"
+                style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}
+              >
+                <Camera className="w-4 h-4" />
               </div>
-              <h2 className="font-bold text-gray-900 text-lg">Photos</h2>
+              <div>
+                <h3 className="text-base font-bold" style={{ color: 'var(--v-text)' }}>Photos</h3>
+                <p className="text-xs" style={{ color: 'var(--v-text-muted)' }}>{photos.length}/5 required</p>
+              </div>
             </div>
-            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-              photos.length >= 5 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-            }`}>
-              {photos.length}/5 required
+            <span
+              className="text-xs font-bold px-2 py-1 rounded-md"
+              style={{
+                backgroundColor: photos.length >= 5 ? 'var(--v-success-bg)' : 'var(--v-bg-subtle)',
+                color: photos.length >= 5 ? 'var(--v-success)' : 'var(--v-text-muted)'
+              }}
+            >
+              {photos.length >= 5 ? 'Complete' : `${photos.length}/5`}
             </span>
           </div>
 
           {photos.length === 0 ? (
-            <div
+            <button
               onClick={handleCapture}
-              className="border-2 border-dashed border-gray-300 rounded-xl p-12 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all"
+              className="w-full py-10 rounded-xl border-2 border-dashed flex flex-col items-center gap-3 transition-all"
+              style={{
+                borderColor: 'var(--v-border)',
+                backgroundColor: 'var(--v-bg-subtle)'
+              }}
             >
-              <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Camera className="w-8 h-8 text-blue-600" />
+              <div
+                className="flex items-center justify-center w-14 h-14 rounded-2xl"
+                style={{ backgroundColor: 'var(--v-bg-elevated)', border: '1px solid var(--v-border)' }}
+              >
+                <ImagePlus className="w-6 h-6" style={{ color: 'var(--v-text-muted)' }} />
               </div>
-              <p className="text-gray-700 font-semibold mb-2 text-lg">Tap to capture photos</p>
-              <p className="text-gray-500">or drag and drop</p>
-            </div>
+              <div className="text-center">
+                <p className="font-semibold text-sm" style={{ color: 'var(--v-text-secondary)' }}>Tap to add photos</p>
+                <p className="text-xs mt-1" style={{ color: 'var(--v-text-muted)' }}>Capture or upload from gallery</p>
+              </div>
+            </button>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               {photos.map((photo, index) => (
                 <div key={index} className="relative group">
-                  <img src={photo} alt={`Photo ${index + 1}`} className="w-full h-40 object-cover rounded-xl shadow-md" />
+                  <img
+                    src={photo}
+                    alt={`Photo ${index + 1}`}
+                    className="w-full h-36 object-cover rounded-xl"
+                    style={{ border: '1px solid var(--v-border)' }}
+                  />
                   <button
                     onClick={() => handleRemovePhoto(index)}
-                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full shadow-lg hover:bg-red-600 transition-colors"
+                    className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 rounded-full"
+                    style={{ backgroundColor: 'var(--v-danger-bg)', color: 'var(--v-danger)' }}
                   >
                     <X className="w-4 h-4" />
                   </button>
-                  <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-xs font-medium">
+                  <span
+                    className="absolute bottom-2 left-2 text-xs font-bold px-2 py-0.5 rounded-md"
+                    style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white' }}
+                  >
                     #{index + 1}
-                  </div>
+                  </span>
                 </div>
               ))}
               {photos.length < 5 && (
-                <div
+                <button
                   onClick={handleCapture}
-                  className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all flex items-center justify-center h-40"
+                  className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed gap-2"
+                  style={{
+                    borderColor: 'var(--v-border)',
+                    backgroundColor: 'var(--v-bg-subtle)'
+                  }}
                 >
-                  <div className="text-center">
-                    <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-500">Add photo</p>
-                  </div>
-                </div>
+                  <ImagePlus className="w-6 h-6" style={{ color: 'var(--v-text-muted)' }} />
+                  <span className="text-xs font-medium" style={{ color: 'var(--v-text-muted)' }}>Add photo</span>
+                </button>
               )}
             </div>
           )}
@@ -134,30 +169,40 @@ export default function EvidenceCapture() {
         </div>
 
         {/* Location */}
-        <div className="bg-white rounded-xl shadow-xl p-6">
-          <div className="flex items-center mb-6">
-            <div className="p-2 bg-green-100 rounded-lg mr-3">
-              <MapPin className="w-5 h-5 text-green-600" />
+        <div className="v-card p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div
+              className="flex items-center justify-center w-9 h-9 rounded-xl"
+              style={{ backgroundColor: '#ecfdf5', color: '#059669' }}
+            >
+              <MapPin className="w-4 h-4" />
             </div>
-            <h2 className="font-bold text-gray-900 text-lg">Location</h2>
+            <h3 className="text-base font-bold" style={{ color: 'var(--v-text)' }}>Location</h3>
           </div>
-          
+
           {location ? (
-            <div className="flex items-center justify-between bg-green-50 p-4 rounded-xl border border-green-200">
-              <div className="flex items-center">
-                <div className="bg-green-100 p-2 rounded-full mr-3">
-                  <Check className="w-5 h-5 text-green-600" />
+            <div
+              className="flex items-center justify-between p-4 rounded-xl"
+              style={{ backgroundColor: 'var(--v-success-bg)', border: '1px solid #a7f3d0' }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center justify-center w-8 h-8 rounded-full"
+                  style={{ backgroundColor: 'var(--v-bg-elevated)' }}
+                >
+                  <Check className="w-4 h-4" style={{ color: 'var(--v-success)' }} />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">Location captured</p>
-                  <p className="text-sm text-gray-600 font-mono">
+                  <p className="text-sm font-bold" style={{ color: 'var(--v-text)' }}>Location captured</p>
+                  <p className="text-xs font-mono mt-0.5" style={{ color: 'var(--v-text-tertiary)' }}>
                     {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setLocation(null)}
-                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-200 rounded-full transition-colors"
+                className="p-2 rounded-lg"
+                style={{ color: 'var(--v-text-muted)' }}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -165,39 +210,43 @@ export default function EvidenceCapture() {
           ) : (
             <button
               onClick={handleGetLocation}
-              className="w-full border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-all flex items-center justify-center"
+              className="w-full flex items-center justify-center gap-3 p-5 rounded-xl border-2 border-dashed"
+              style={{
+                borderColor: 'var(--v-border)',
+                backgroundColor: 'var(--v-bg-subtle)'
+              }}
             >
-              <div className="bg-gray-100 p-3 rounded-lg mr-3">
-                <MapPin className="w-6 h-6 text-gray-400" />
-              </div>
-              <span className="text-gray-700 font-semibold">Capture GPS location</span>
+              <MapPin className="w-5 h-5" style={{ color: 'var(--v-text-muted)' }} />
+              <span className="font-semibold text-sm" style={{ color: 'var(--v-text-secondary)' }}>Capture GPS location</span>
             </button>
           )}
         </div>
 
-        {/* Validation Message */}
+        {/* Validation */}
         {!canContinue && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start">
-            <AlertCircle className="w-5 h-5 text-amber-600 mr-3 mt-0.5" />
+          <div className="v-alert v-alert-warning">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-amber-900">Requirements not met</p>
-              <p className="text-sm text-amber-700">Please capture at least 1 photo and location data to continue.</p>
+              <p className="font-bold text-sm">Requirements</p>
+              <p className="text-sm opacity-90">Add at least 1 photo and capture location to continue.</p>
             </div>
           </div>
         )}
 
-        {/* Continue Button */}
+        {/* Continue */}
         <button
           onClick={handleContinue}
           disabled={!canContinue}
-          className={`w-full px-6 py-4 rounded-xl font-bold flex items-center justify-center text-lg transition-all ${
-            canContinue
-              ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          }`}
+          className="v-btn w-full justify-center"
+          style={{
+            ...(canContinue
+              ? { backgroundColor: 'var(--v-primary)', color: 'white', borderColor: 'var(--v-primary)' }
+              : { backgroundColor: 'var(--v-bg-subtle)', color: 'var(--v-text-muted)', borderColor: 'var(--v-border-light)', cursor: 'not-allowed' }
+            )
+          }}
         >
           Continue to Checklist
-          <ArrowRight className="w-5 h-5 ml-2" />
+          <ArrowRight className="w-5 h-5" />
         </button>
       </div>
     </div>

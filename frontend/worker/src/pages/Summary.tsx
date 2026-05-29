@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { CheckCircle, Upload, Home, AlertCircle, FileText, MapPin, Camera, List } from 'lucide-react'
+import { CheckCircle, Upload, Home, AlertCircle, Camera, MapPin, List, FileText } from 'lucide-react'
 
 export default function Summary() {
   const navigate = useNavigate()
@@ -11,8 +11,7 @@ export default function Summary() {
 
   const handleSubmit = async () => {
     setIsUploading(true)
-    
-    // Simulate upload progress
+
     for (let i = 0; i <= 100; i += 10) {
       await new Promise(resolve => setTimeout(resolve, 200))
       setUploadProgress(i)
@@ -28,129 +27,147 @@ export default function Summary() {
 
   if (isComplete) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-500 to-emerald-600 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
-          <div className="flex flex-col items-center text-center">
-            <div className="bg-green-100 p-4 rounded-full mb-6">
-              <CheckCircle className="w-20 h-20 text-green-600" />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Evidence Submitted!</h2>
-            <p className="text-gray-600 mb-6 text-lg">
-              Your evidence has been successfully uploaded and is now being validated. You will receive a confirmation once the review is complete.
-            </p>
-            
-            <div className="w-full bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 mb-6 border border-green-200">
-              <p className="text-sm font-semibold text-gray-500 mb-2 uppercase tracking-wide">Session ID</p>
-              <p className="font-mono text-lg text-gray-900 font-bold">{sessionId}</p>
-            </div>
-
-            <button
-              onClick={handleReturnHome}
-              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-4 rounded-xl font-bold hover:from-green-700 hover:to-emerald-700 transition-all flex items-center justify-center shadow-lg"
-            >
-              <Home className="w-5 h-5 mr-2" />
-              Return to Home
-            </button>
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: 'var(--v-bg)' }}>
+        <div className="v-card p-10 max-w-sm w-full text-center">
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6"
+            style={{ backgroundColor: 'var(--v-success-bg)' }}
+          >
+            <CheckCircle className="w-8 h-8" style={{ color: 'var(--v-success)' }} />
           </div>
+          <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--v-text)' }}>Submitted!</h2>
+          <p className="mb-6" style={{ color: 'var(--v-text-tertiary)' }}>
+            Your evidence has been uploaded and is being validated.
+          </p>
+
+          <div
+            className="p-4 rounded-xl mb-6 text-left"
+            style={{ backgroundColor: 'var(--v-bg-subtle)', border: '1px solid var(--v-border)' }}
+          >
+            <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--v-text-muted)' }}>Session ID</p>
+            <p className="font-mono text-sm font-bold" style={{ color: 'var(--v-text)' }}>{sessionId}</p>
+          </div>
+
+          <button onClick={handleReturnHome} className="v-btn v-btn-primary w-full">
+            <Home className="w-4 h-4" />
+            Return Home
+          </button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
+    <div className="min-h-screen pb-8" style={{ backgroundColor: 'var(--v-bg)' }}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-6 pb-16">
-        <h1 className="text-3xl font-bold mb-2">Review & Submit</h1>
-        <p className="text-blue-100 text-lg">Review your evidence before submitting</p>
+      <div className="v-section-header pb-10">
+        <div className="px-4">
+          <div className="flex items-center gap-2 mb-2">
+            <FileText className="w-4 h-4 opacity-70" />
+            <span className="text-xs font-semibold uppercase tracking-wider opacity-70">Review</span>
+          </div>
+          <h1>Review & Submit</h1>
+          <p className="mt-1">Confirm your evidence before submitting</p>
+        </div>
       </div>
 
-      <div className="px-4 -mt-10 py-6 space-y-6">
-        {/* Summary Cards */}
-        <div className="bg-white rounded-xl shadow-xl p-6">
-          <h2 className="font-bold text-gray-900 mb-6 text-xl">Evidence Summary</h2>
-          
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center">
-                <div className="bg-blue-100 p-2 rounded-lg mr-3">
-                  <Camera className="w-5 h-5 text-blue-600" />
+      <div className="px-4 -mt-6 space-y-4">
+        {/* Summary */}
+        <div className="v-card p-5">
+          <h3 className="text-base font-bold mb-4" style={{ color: 'var(--v-text)' }}>Evidence Summary</h3>
+          <div className="space-y-3">
+            <div
+              className="flex items-center justify-between p-3 rounded-lg"
+              style={{ backgroundColor: 'var(--v-bg-subtle)' }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center justify-center w-8 h-8 rounded-lg"
+                  style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}
+                >
+                  <Camera className="w-4 h-4" />
                 </div>
-                <span className="text-gray-700 font-semibold">Photos captured</span>
+                <span className="text-sm font-medium" style={{ color: 'var(--v-text-secondary)' }}>Photos captured</span>
               </div>
-              <span className="font-bold text-gray-900 text-lg">5/5</span>
+              <span className="text-sm font-bold" style={{ color: 'var(--v-text)' }}>5/5</span>
             </div>
-            
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center">
-                <div className="bg-green-100 p-2 rounded-lg mr-3">
-                  <MapPin className="w-5 h-5 text-green-600" />
+
+            <div
+              className="flex items-center justify-between p-3 rounded-lg"
+              style={{ backgroundColor: 'var(--v-bg-subtle)' }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center justify-center w-8 h-8 rounded-lg"
+                  style={{ backgroundColor: '#ecfdf5', color: '#059669' }}
+                >
+                  <MapPin className="w-4 h-4" />
                 </div>
-                <span className="text-gray-700 font-semibold">GPS location</span>
+                <span className="text-sm font-medium" style={{ color: 'var(--v-text-secondary)' }}>GPS location</span>
               </div>
-              <span className="font-bold text-green-600 text-lg">Captured</span>
+              <span className="text-sm font-bold" style={{ color: 'var(--v-success)' }}>Captured</span>
             </div>
-            
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center">
-                <div className="bg-purple-100 p-2 rounded-lg mr-3">
-                  <List className="w-5 h-5 text-purple-600" />
+
+            <div
+              className="flex items-center justify-between p-3 rounded-lg"
+              style={{ backgroundColor: 'var(--v-bg-subtle)' }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center justify-center w-8 h-8 rounded-lg"
+                  style={{ backgroundColor: '#faf5ff', color: '#7c3aed' }}
+                >
+                  <List className="w-4 h-4" />
                 </div>
-                <span className="text-gray-700 font-semibold">Checklist items</span>
+                <span className="text-sm font-medium" style={{ color: 'var(--v-text-secondary)' }}>Checklist</span>
               </div>
-              <span className="font-bold text-gray-900 text-lg">5/5 completed</span>
+              <span className="text-sm font-bold" style={{ color: 'var(--v-text)' }}>5/5 complete</span>
             </div>
-            
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center">
-                <div className="bg-orange-100 p-2 rounded-lg mr-3">
-                  <AlertCircle className="w-5 h-5 text-orange-600" />
+
+            <div
+              className="flex items-center justify-between p-3 rounded-lg"
+              style={{ backgroundColor: 'var(--v-bg-subtle)' }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center justify-center w-8 h-8 rounded-lg"
+                  style={{ backgroundColor: '#fffbeb', color: '#d97706' }}
+                >
+                  <AlertCircle className="w-4 h-4" />
                 </div>
-                <span className="text-gray-700 font-semibold">Estimated upload size</span>
+                <span className="text-sm font-medium" style={{ color: 'var(--v-text-secondary)' }}>Upload size</span>
               </div>
-              <span className="font-bold text-gray-900 text-lg">~15 MB</span>
+              <span className="text-sm font-bold" style={{ color: 'var(--v-text)' }}>~15 MB</span>
             </div>
           </div>
         </div>
 
-        {/* Offline Notice */}
-        <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-5">
-          <div className="flex items-start">
-            <div className="bg-orange-100 p-2 rounded-lg mr-3 mt-0.5">
-              <AlertCircle className="w-5 h-5 text-orange-600" />
-            </div>
-            <div>
-              <p className="font-bold text-orange-900 mb-1">Offline Mode</p>
-              <p className="text-orange-700">
-                Your evidence will be cached locally and uploaded automatically when you're back online.
-              </p>
-            </div>
+        {/* Offline notice */}
+        <div className="v-alert v-alert-warning">
+          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="font-bold text-sm">Offline Support</p>
+            <p className="text-sm opacity-90">Evidence will cache locally and upload automatically when online.</p>
           </div>
         </div>
 
         {/* Upload Progress */}
         {isUploading && (
-          <div className="bg-white rounded-xl shadow-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <span className="font-bold text-gray-900 text-lg">Uploading evidence...</span>
-              <span className="text-sm font-bold text-blue-600">{uploadProgress}%</span>
+          <div className="v-card p-5">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-bold" style={{ color: 'var(--v-text)' }}>Uploading...</span>
+              <span className="text-sm font-bold" style={{ color: 'var(--v-accent)' }}>{uploadProgress}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
-              <div 
-                className="bg-gradient-to-r from-blue-600 to-purple-600 h-3 rounded-full transition-all"
-                style={{ width: `${uploadProgress}%` }}
-              />
+            <div className="v-progress-track">
+              <div className="v-progress-fill" style={{ width: `${uploadProgress}%` }} />
             </div>
           </div>
         )}
 
-        {/* Submit Button */}
+        {/* Submit */}
         {!isUploading && (
-          <button
-            onClick={handleSubmit}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition-all flex items-center justify-center text-lg shadow-lg"
-          >
-            <Upload className="w-5 h-5 mr-2" />
+          <button onClick={handleSubmit} className="v-btn v-btn-primary w-full justify-center">
+            <Upload className="w-5 h-5" />
             Submit Evidence
           </button>
         )}
