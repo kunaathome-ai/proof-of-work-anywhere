@@ -1,0 +1,227 @@
+version: '3.8'
+
+services:
+  # Redis for queues and caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO for S3-compatible storage
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Job Service
+  job-service:
+    build:
+      context: ../../backend/services/job-service
+      dockerfile: ../../Dockerfile.service
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - DB_PATH=/data/jobs.db
+      - NODE_ENV=development
+    volumes:
+      - job-data:/data
+      - ../../backend/services/job-service/src:/app/src
+    depends_on:
+      - redis
+
+  # Session Service
+  session-service:
+    build:
+      context: ../../backend/services/session-service
+      dockerfile: ../../Dockerfile.service
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - DB_PATH=/data/sessions.db
+      - JWT_SECRET=dev-secret-change-in-production
+      - NODE_ENV=development
+    volumes:
+      - session-data:/data
+      - ../../backend/services/session-service/src:/app/src
+    depends_on:
+      - redis
+
+  # Evidence Service
+  evidence-service:
+    build:
+      context: ../../backend/services/evidence-service
+      dockerfile: ../../Dockerfile.service
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - DB_PATH=/data/evidence.db
+      - NODE_ENV=development
+    volumes:
+      - evidence-data:/data
+      - storage-data:/storage
+      - ../../backend/services/evidence-service/src:/app/src
+    depends_on:
+      - redis
+      - minio
+
+  # Config Service
+  config-service:
+    build:
+      context: ../../backend/services/config-service
+      dockerfile: ../../Dockerfile.service
+    ports:
+      - "3004:3004"
+    environment:
+      - PORT=3004
+      - DB_PATH=/data/config.db
+      - NODE_ENV=development
+    volumes:
+      - config-data:/data
+      - ../../backend/services/config-service/src:/app/src
+    depends_on:
+      - redis
+
+  # AI Inspector
+  ai-inspector:
+    build:
+      context: ../../backend/workers/ai-inspector
+      dockerfile: ../../Dockerfile.worker
+    ports:
+      - "3005:3005"
+    environment:
+      - PORT=3005
+      - REDIS_URL=redis://redis:6379
+      - NODE_ENV=development
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    volumes:
+      - ../../backend/workers/ai-inspector/src:/app/src
+    depends_on:
+      - redis
+
+  # Validation Worker
+  validation-worker:
+    build:
+      context: ../../backend/workers/validation-worker
+      dockerfile: ../../Dockerfile.worker
+    ports:
+      - "3006:3006"
+    environment:
+      - PORT=3006
+      - REDIS_URL=redis://redis:6379
+      - EVIDENCE_SERVICE_URL=http://evidence-service:3003
+      - AI_INSPECTOR_URL=http://ai-inspector:3005
+      - NODE_ENV=development
+    volumes:
+      - ../../backend/workers/validation-worker/src:/app/src
+    depends_on:
+      - redis
+      - evidence-service
+      - ai-inspector
+
+  # Report Service
+  report-service:
+    build:
+      context: ../../backend/services/report-service
+      dockerfile: ../../Dockerfile.service
+    ports:
+      - "3007:3007"
+    environment:
+      - PORT=3007
+      - PRIVATE_KEY=dev-private-key-change-in-production
+      - NODE_ENV=development
+    volumes:
+      - report-data:/data
+      - ../../backend/services/report-service/src:/app/src
+
+  # Delivery Service
+  delivery-service:
+    build:
+      context: ../../backend/services/delivery-service
+      dockerfile: ../../Dockerfile.service
+    ports:
+      - "3008:3008"
+    environment:
+      - PORT=3008
+      - NODE_ENV=development
+    volumes:
+      - ../../backend/services/delivery-service/src:/app/src
+
+  # Billing Service
+  billing-service:
+    build:
+      context: ../../backend/services/billing-service
+      dockerfile: ../../Dockerfile.service
+    ports:
+      - "3009:3009"
+    environment:
+      - PORT=3009
+      - DB_PATH=/data/billing.db
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-sk_test_placeholder}
+      - NODE_ENV=development
+    volumes:
+      - billing-data:/data
+      - ../../backend/services/billing-service/src:/app/src
+
+  # Admin Console
+  admin-console:
+    build:
+      context: ../../frontend/admin
+      dockerfile: ../../Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:3001
+    volumes:
+      - ../../frontend/admin/src:/app/src
+    depends_on:
+      - job-service
+      - session-service
+      - config-service
+
+  # Worker UI
+  worker-ui:
+    build:
+      context: ../../frontend/worker
+      dockerfile: ../../Dockerfile.frontend
+    ports:
+      - "3010:3010"
+    environment:
+      - VITE_API_URL=http://localhost:3002
+    volumes:
+      - ../../frontend/worker/src:/app/src
+    depends_on:
+      - session-service
+      - evidence-service
+
+volumes:
+  redis-data:
+  minio-data:
+  job-data:
+  session-data:
+  evidence-data:
+  config-data:
+  report-data:
+  billing-data:
+  storage-data:

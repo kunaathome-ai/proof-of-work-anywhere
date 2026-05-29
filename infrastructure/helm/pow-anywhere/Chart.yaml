@@ -1,0 +1,13 @@
+apiVersion: v2
+name: pow-anywhere
+description: A Helm chart for Proof of Work Anywhere micro-SaaS
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - proof-of-work
+  - validation
+  - ai
+  - microservices
+maintainers:
+  - name: POW Team

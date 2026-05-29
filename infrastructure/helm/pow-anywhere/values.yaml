@@ -1,0 +1,276 @@
+# Default values for pow-anywhere
+replicaCount: 2
+
+image:
+  repository: pow-anywhere
+  pullPolicy: IfNotPresent
+  tag: "1.0.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Redis configuration
+redis:
+  enabled: true
+  image: redis:7-alpine
+  port: 6379
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# MinIO configuration
+minio:
+  enabled: true
+  image: minio/minio:latest
+  port: 9000
+  consolePort: 9001
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  persistence:
+    enabled: true
+    size: 10Gi
+
+# Services configuration
+services:
+  job:
+    enabled: true
+    port: 3001
+    replicas: 2
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+  session:
+    enabled: true
+    port: 3002
+    replicas: 2
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+  evidence:
+    enabled: true
+    port: 3003
+    replicas: 2
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+  config:
+    enabled: true
+    port: 3004
+    replicas: 1
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+  aiInspector:
+    enabled: true
+    port: 3005
+    replicas: 2
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+
+  validation:
+    enabled: true
+    port: 3006
+    replicas: 2
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+  report:
+    enabled: true
+    port: 3007
+    replicas: 1
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+  delivery:
+    enabled: true
+    port: 3008
+    replicas: 1
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+  billing:
+    enabled: true
+    port: 3009
+    replicas: 1
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+# Frontend configuration
+frontend:
+  admin:
+    enabled: true
+    port: 3000
+    replicas: 2
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+  worker:
+    enabled: true
+    port: 3010
+    replicas: 2
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+# Runtime mode: local, on_prem, cloud
+runtimeMode: "cloud"
+
+# Storage configuration
+storage:
+  type: "s3" # local, s3, azure_blob, minio
+  s3:
+    bucket: ""
+    region: ""
+    accessKeyId: ""
+    secretAccessKey: ""
+  azure:
+    connectionString: ""
+    containerName: ""
+
+# AI configuration
+ai:
+  provider: "openai" # openai, azure_openai, local
+  openai:
+    apiKey: ""
+    model: "gpt-4o"
+  azure:
+    endpoint: ""
+    apiKey: ""
+    deployment: ""
+
+# Database configuration
+database:
+  type: "sqlite" # sqlite, postgres
+  postgres:
+    host: ""
+    port: 5432
+    database: ""
+    username: ""
+    password: ""

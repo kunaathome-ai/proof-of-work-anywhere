@@ -1,0 +1,178 @@
+name: CD
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+
+jobs:
+  deploy-azure:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+      
+      - name: Terraform Init
+        run: |
+          cd infrastructure/terraform/azure
+          terraform init
+      
+      - name: Terraform Apply
+        run: |
+          cd infrastructure/terraform/azure
+          terraform apply -auto-approve
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      
+      - name: Get AKS Credentials
+        run: |
+          az aks get-credentials --resource-group pow-anywhere-rg --name pow-aks
+      
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+      
+      - name: Deploy to AKS
+        run: |
+          helm upgrade --install pow-anywhere infrastructure/helm/pow-anywhere \
+            --namespace default \
+            --create-namespace \
+            --set image.tag=${{ github.sha }} \
+            --wait
+
+  deploy-aws:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+      
+      - name: Terraform Init
+        run: |
+          cd infrastructure/terraform/aws
+          terraform init
+      
+      - name: Terraform Apply
+        run: |
+          cd infrastructure/terraform/aws
+          terraform apply -auto-approve
+      
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --name pow-eks --region us-east-1
+      
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+      
+      - name: Deploy to EKS
+        run: |
+          helm upgrade --install pow-anywhere infrastructure/helm/pow-anywhere \
+            --namespace default \
+            --create-namespace \
+            --set image.tag=${{ github.sha }} \
+            --wait
+
+  deploy-gcp:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+      
+      - name: Terraform Init
+        run: |
+          cd infrastructure/terraform/gcp
+          terraform init
+      
+      - name: Terraform Apply
+        run: |
+          cd infrastructure/terraform/gcp
+          terraform apply -auto-approve
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+      
+      - name: Get GKE credentials
+        run: |
+          gcloud container clusters get-credentials pow-gke --region us-central1
+      
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+      
+      - name: Deploy to GKE
+        run: |
+          helm upgrade --install pow-anywhere infrastructure/helm/pow-anywhere \
+            --namespace default \
+            --create-namespace \
+            --set image.tag=${{ github.sha }} \
+            --wait
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: [deploy-azure]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: |
+          cd tests/e2e
+          npm ci
+      
+      - name: Run E2E tests
+        run: |
+          cd tests/e2e
+          npm run test
+        env:
+          ADMIN_URL: ${{ secrets.ADMIN_URL }}
+          WORKER_URL: ${{ secrets.WORKER_URL }}
+      
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: e2e-test-results
+          path: tests/e2e/cypress/screenshots

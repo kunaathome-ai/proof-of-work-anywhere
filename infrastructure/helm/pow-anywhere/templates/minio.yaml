@@ -1,0 +1,99 @@
+{{- if .Values.minio.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pow-anywhere.fullname" . }}-minio
+  labels:
+    {{- include "pow-anywhere.labels" . | nindent 4 }}
+    app: minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "pow-anywhere.selectorLabels" . | nindent 6 }}
+      app: minio
+  template:
+    metadata:
+      labels:
+        {{- include "pow-anywhere.selectorLabels" . | nindent 8 }}
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: "{{ .Values.minio.image }}"
+        args:
+        - server
+        - /data
+        - --console-address
+        - ":9001"
+        ports:
+        - containerPort: {{ .Values.minio.port }}
+        - containerPort: {{ .Values.minio.consolePort }}
+        env:
+        - name: MINIO_ROOT_USER
+          value: "minioadmin"
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "pow-anywhere.fullname" . }}-minio
+              key: password
+        resources:
+          {{- toYaml .Values.minio.resources | nindent 10 }}
+        {{- if .Values.minio.persistence.enabled }}
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        {{- end }}
+      {{- if .Values.minio.persistence.enabled }}
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ include "pow-anywhere.fullname" . }}-minio
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pow-anywhere.fullname" . }}-minio
+  labels:
+    {{- include "pow-anywhere.labels" . | nindent 4 }}
+    app: minio
+spec:
+  ports:
+  - port: {{ .Values.minio.port }}
+    targetPort: {{ .Values.minio.port }}
+    name: api
+  - port: {{ .Values.minio.consolePort }}
+    targetPort: {{ .Values.minio.consolePort }}
+    name: console
+  selector:
+    {{- include "pow-anywhere.selectorLabels" . | nindent 4 }}
+    app: minio
+---
+{{- if .Values.minio.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "pow-anywhere.fullname" . }}-minio
+  labels:
+    {{- include "pow-anywhere.labels" . | nindent 4 }}
+    app: minio
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.minio.persistence.size }}
+{{- end }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "pow-anywhere.fullname" . }}-minio
+  labels:
+    {{- include "pow-anywhere.labels" . | nindent 4 }}
+    app: minio
+type: Opaque
+stringData:
+  password: "minioadmin"
+{{- end }}

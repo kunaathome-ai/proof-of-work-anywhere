@@ -1,0 +1,28 @@
+{
+  "name": "@pow-backend/config-service",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "better-sqlite3": "^9.2.0",
+    "uuid": "^9.0.1",
+    "joi": "^17.11.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.20",
+    "@types/uuid": "^9.0.6",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.2.0",
+    "@types/jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0"
+  }
+}
